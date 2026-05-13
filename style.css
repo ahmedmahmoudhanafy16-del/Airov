@@ -319,15 +319,4 @@ footer {
     opacity: 0.8;
 }
 
-@media (max-width: 1024px) {
-    .asymmetric-grid { grid-template-columns: 1fr; gap: 4rem; }
-    .hero-img-container { width: 100%; z-index: -1; }
-    .hero { padding-top: 10rem; }
-    .hero-logo-large { width: 300px; }
-    .collection-grid { grid-template-columns: 1fr 1fr; }
-}
-@media (max-width: 768px) {
-    .nav-links { display: none; }
-    .collection-grid { grid-template-columns: 1fr; }
-    .grid-title { font-size: 3rem; }
-}
+/* Desktop layout forced on all devices - no responsive breakpoints */
