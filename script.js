@@ -36,19 +36,44 @@ function renderSiteData() {
     // Render Products (Index page)
     const productsContainer = document.getElementById('products-container');
     if (productsContainer) {
-        siteData.products.forEach(product => {
-            const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
-            const colorName = product.colors && product.colors.length > 0 ? product.colors[0].name : '';
-            productsContainer.innerHTML += `
-                <a href="product.html?id=${product.id}" class="collection-item" style="text-decoration: none; color: inherit;">
-                    <img src="${product.image}" alt="${product.name}" loading="lazy">
-                    <div class="collection-info">
-                        <h3 class="collection-name">${product.name}</h3>
-                        <p class="collection-price">${colorName} / ${siteData.brand.currency} ${product.price}</p>
-                        <span class="order-btn">${statusLabel}</span>
-                    </div>
-                </a>
-            `;
+        window.renderProducts = function(filterCategory = 'all') {
+            productsContainer.innerHTML = '';
+            
+            const filteredProducts = filterCategory === 'all' 
+                ? siteData.products 
+                : siteData.products.filter(p => p.category === filterCategory);
+
+            filteredProducts.forEach(product => {
+                const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
+                const colorName = product.colors && product.colors.length > 0 ? product.colors[0].name : '';
+                productsContainer.innerHTML += `
+                    <a href="product.html?id=${product.id}" class="collection-item" style="text-decoration: none; color: inherit;">
+                        <img src="${product.image}" alt="${product.name}" loading="lazy">
+                        <div class="collection-info">
+                            <h3 class="collection-name">${product.name}</h3>
+                            <p class="collection-price">${colorName} / ${siteData.brand.currency} ${product.price}</p>
+                            <span class="order-btn">${statusLabel}</span>
+                        </div>
+                    </a>
+                `;
+            });
+            
+            // Re-trigger scroll animations for new items if GSAP is loaded
+            if (typeof ScrollTrigger !== 'undefined') {
+                ScrollTrigger.refresh();
+            }
+        };
+
+        // Initial render
+        renderProducts('all');
+
+        // Filter button listeners
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                renderProducts(e.target.getAttribute('data-filter'));
+            });
         });
     }
 

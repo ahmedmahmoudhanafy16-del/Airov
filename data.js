@@ -26,6 +26,7 @@ const siteData = {
         {
             "id": "spectrum-hoodie",
             "name": "Spectrum Hoodie",
+            "category": "hoodies",
             "colors": [
                 {"name": "Rose", "hex": "#DCA7A7"},
                 {"name": "Onyx", "hex": "#111111"},
@@ -39,6 +40,7 @@ const siteData = {
         {
             "id": "breathe-windbreaker",
             "name": "Breathe Windbreaker",
+            "category": "jackets",
             "colors": [
                 {"name": "Onyx", "hex": "#111111"}
             ],
@@ -50,6 +52,7 @@ const siteData = {
         {
             "id": "essential-tee",
             "name": "Essential Tee",
+            "category": "tees",
             "colors": [
                 {"name": "Ghost", "hex": "#f0f0f0"},
                 {"name": "Onyx", "hex": "#111111"}
