@@ -1,11 +1,46 @@
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-// Loading Screen
+// Loading Screen & Initial Animations
 window.addEventListener('load', () => {
-    setTimeout(() => {
-        document.querySelector('.loader-wrapper').classList.add('hidden');
-    }, 1000); // Small delay to let the animation play
+    if (typeof gsap !== 'undefined') {
+        const tl = gsap.timeline();
+        
+        // Hide loader
+        tl.to('.loader-wrapper', {
+            opacity: 0,
+            duration: 1,
+            ease: "power2.inOut",
+            onComplete: () => {
+                const loader = document.querySelector('.loader-wrapper');
+                if(loader) loader.style.display = 'none';
+            }
+        });
+        
+        // Animate Hero Elements
+        if (document.querySelector('.hero-logo-large')) {
+            tl.fromTo('.hero-logo-large', 
+                { y: 50, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: "power3.out" },
+                "-=0.5"
+            )
+            .fromTo('.hero-slogan',
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 1, ease: "power3.out" },
+                "-=0.7"
+            )
+            .fromTo('.hero .btn-large',
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+                "-=0.8"
+            );
+        }
+    } else {
+        setTimeout(() => {
+            const loader = document.querySelector('.loader-wrapper');
+            if(loader) loader.classList.add('hidden');
+        }, 1000);
+    }
 });
 
 // Custom Cursor (Desktop Only)
