@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIROV | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Login Screen (Hidden by default, will be controlled via JS) -->
+    <div id="login-screen" class="hidden">
+        <div class="login-box">
+            <h2>AIROV ADMIN</h2>
+            <input type="email" id="admin-email" placeholder="Email" autocomplete="off">
+            <input type="password" id="admin-pass" placeholder="Password">
+            <button id="login-btn" class="btn-primary">Login</button>
+            <p id="login-error" style="color: red; margin-top: 1rem; display: none;">Invalid credentials</p>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">AIROV</div>
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" data-target="products-view">Products</button>
+                <button class="nav-btn" data-target="categories-view">Categories</button>
+                <button class="nav-btn" data-target="settings-view">Settings</button>
+            </nav>
+            <button id="logout-btn" class="btn-secondary" style="margin-top: auto;">Logout</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Products View -->
+            <section id="products-view" class="view-section active">
+                <div class="header-flex">
+                    <h1>Manage Products</h1>
+                    <button id="show-add-product" class="btn-primary">+ Add Product</button>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-tbody">
+                            <!-- Dynamic Products -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Add/Edit Product Modal -->
+            <div id="product-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="header-flex">
+                        <h2 id="modal-title">Add New Product</h2>
+                        <button class="close-modal">✕</button>
+                    </div>
+                    <form id="product-form" class="admin-form">
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="prod-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea id="prod-desc" rows="3" required></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price (EGP)</label>
+                                <input type="number" id="prod-price" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="prod-category" required>
+                                    <option value="hoodies">Hoodies</option>
+                                    <option value="jackets">Jackets</option>
+                                    <option value="tees">Tees</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Images (Select multiple)</label>
+                            <input type="file" id="prod-images" accept="image/*" multiple>
+                            <div id="image-preview" class="image-preview-container"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Inventory (Sizes & Quantities)</label>
+                            <div class="inventory-grid">
+                                <div><label>S</label><input type="number" id="qty-S" value="0" min="0"></div>
+                                <div><label>M</label><input type="number" id="qty-M" value="0" min="0"></div>
+                                <div><label>L</label><input type="number" id="qty-L" value="0" min="0"></div>
+                                <div><label>XL</label><input type="number" id="qty-XL" value="0" min="0"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Colors</label>
+                            <input type="text" id="prod-colors" placeholder="e.g. Black, White, Red">
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-primary" style="flex:1;">Save Product</button>
+                            <button type="button" class="btn-secondary close-modal" style="flex:1;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Categories View -->
+            <section id="categories-view" class="view-section hidden">
+                <div class="header-flex">
+                    <h1>Manage Categories</h1>
+                    <button class="btn-primary">+ Add Category</button>
+                </div>
+                <p>Category management will be synced with Firebase here.</p>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Firebase SDKs will go here -->
+    <script src="app.js"></script>
+</body>
+</html>
