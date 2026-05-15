@@ -1,6 +1,28 @@
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
+// Hamburger Menu Logic
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('nav-menu');
+const navLinks = document.querySelectorAll('.nav-links a, .dm-link');
+
+if (hamburger) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('open');
+        document.body.classList.toggle('menu-open');
+    });
+
+    // Close menu when a link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('open');
+            document.body.classList.remove('menu-open');
+        });
+    });
+}
+
 // Navbar Scroll Effect
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
