@@ -26,25 +26,37 @@ const siteData = {
         {
             "id": "spectrum-hoodie",
             "name": "Spectrum Hoodie",
-            "color": "Rose",
+            "colors": [
+                {"name": "Rose", "hex": "#DCA7A7"},
+                {"name": "Onyx", "hex": "#111111"},
+                {"name": "Ghost", "hex": "#f0f0f0"}
+            ],
             "price": 1850,
             "image": "assets/pink-hoodie.png",
+            "description": "The Spectrum Hoodie features an oversized fit built for urban utility and unmatched comfort. Heavyweight cotton blend with a dropped shoulder design.",
             "in_stock": true
         },
         {
             "id": "breathe-windbreaker",
             "name": "Breathe Windbreaker",
-            "color": "Onyx",
+            "colors": [
+                {"name": "Onyx", "hex": "#111111"}
+            ],
             "price": 2400,
             "image": "assets/black-jacket.png",
+            "description": "Engineered for the elements. The Breathe Windbreaker offers lightweight protection with a sleek, minimalist silhouette.",
             "in_stock": true
         },
         {
             "id": "essential-tee",
             "name": "Essential Tee",
-            "color": "Ghost",
+            "colors": [
+                {"name": "Ghost", "hex": "#f0f0f0"},
+                {"name": "Onyx", "hex": "#111111"}
+            ],
             "price": 850,
             "image": "assets/pink-hoodie.png",
+            "description": "Your everyday foundation. Premium midweight cotton cut for a perfect relaxed fit.",
             "in_stock": true
         }
     ],

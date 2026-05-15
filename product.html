@@ -249,24 +249,20 @@
         </div>
     </nav>
 
-    <main class="product-section">
-        <div class="product-gallery">
-            <img src="assets/pink-hoodie.png" alt="Spectrum Hoodie Front" loading="lazy">
-            <img src="assets/pink-hoodie.png" alt="Spectrum Hoodie Detail 1" loading="lazy" style="filter: grayscale(1) brightness(0.6);">
-            <img src="assets/pink-hoodie.png" alt="Spectrum Hoodie Detail 2" loading="lazy" style="transform: scaleX(-1);">
+    <main class="product-section" id="product-container" style="display: none;">
+        <div class="product-gallery" id="product-gallery">
+            <!-- Dynamically populated from JS -->
         </div>
 
         <div class="product-details">
-            <div class="product-breadcrumb">Home / Collection / C.1 Series</div>
-            <h1 class="product-title">Spectrum Hoodie</h1>
-            <div class="product-price">EGP 1,850</div>
+            <div class="product-breadcrumb">Home / Collection / <span id="product-breadcrumb-name">Product</span></div>
+            <h1 class="product-title" id="product-title">Product Title</h1>
+            <div class="product-price" id="product-price">EGP 0</div>
 
             <div class="product-options">
-                <div class="option-title">Color: Rose</div>
-                <div class="color-selector">
-                    <button class="color-btn active" style="background-color: #DCA7A7;"></button>
-                    <button class="color-btn" style="background-color: #111111;"></button>
-                    <button class="color-btn" style="background-color: #f0f0f0;"></button>
+                <div class="option-title" id="color-title">Color</div>
+                <div class="color-selector" id="color-selector">
+                    <!-- Dynamically populated -->
                 </div>
             </div>
 
@@ -289,7 +285,7 @@
                 <div class="accordion-item">
                     <div class="accordion-header">Description <span>+</span></div>
                     <div class="accordion-content">
-                        <p>The Spectrum Hoodie features an oversized fit built for urban utility and unmatched comfort. Heavyweight cotton blend with a dropped shoulder design.</p>
+                        <p id="product-desc">Product description goes here.</p>
                     </div>
                 </div>
                 <div class="accordion-item">
@@ -341,6 +337,7 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="data.js"></script>
     <script src="script.js"></script>
     <script>
         // Simple Accordion Logic

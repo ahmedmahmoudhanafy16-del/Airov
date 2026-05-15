@@ -33,22 +33,62 @@ function renderSiteData() {
         });
     }
 
-    // Render Products
+    // Render Products (Index page)
     const productsContainer = document.getElementById('products-container');
     if (productsContainer) {
         siteData.products.forEach(product => {
             const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
+            const colorName = product.colors && product.colors.length > 0 ? product.colors[0].name : '';
             productsContainer.innerHTML += `
                 <a href="product.html?id=${product.id}" class="collection-item" style="text-decoration: none; color: inherit;">
                     <img src="${product.image}" alt="${product.name}" loading="lazy">
                     <div class="collection-info">
                         <h3 class="collection-name">${product.name}</h3>
-                        <p class="collection-price">${product.color} / ${siteData.brand.currency} ${product.price}</p>
+                        <p class="collection-price">${colorName} / ${siteData.brand.currency} ${product.price}</p>
                         <span class="order-btn">${statusLabel}</span>
                     </div>
                 </a>
             `;
         });
+    }
+
+    // Render Single Product Page (product.html)
+    const productContainer = document.getElementById('product-container');
+    if (productContainer) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const product = siteData.products.find(p => p.id === productId);
+
+        if (product) {
+            document.getElementById('product-title').innerText = product.name;
+            document.getElementById('product-breadcrumb-name').innerText = product.name;
+            document.getElementById('product-price').innerText = `${siteData.brand.currency} ${product.price}`;
+            document.getElementById('product-desc').innerText = product.description;
+
+            // Render Gallery (simple mockup with 3 images of the same product)
+            const gallery = document.getElementById('product-gallery');
+            gallery.innerHTML = `
+                <img src="${product.image}" alt="${product.name} Front" loading="lazy">
+                <img src="${product.image}" alt="${product.name} Detail 1" loading="lazy" style="filter: grayscale(1) brightness(0.6);">
+                <img src="${product.image}" alt="${product.name} Detail 2" loading="lazy" style="transform: scaleX(-1);">
+            `;
+
+            // Render Colors
+            const colorSelector = document.getElementById('color-selector');
+            const colorTitle = document.getElementById('color-title');
+            colorSelector.innerHTML = '';
+            if (product.colors && product.colors.length > 0) {
+                colorTitle.innerText = `Color: ${product.colors[0].name}`;
+                product.colors.forEach((c, index) => {
+                    colorSelector.innerHTML += `<button class="color-btn ${index === 0 ? 'active' : ''}" style="background-color: ${c.hex};" onclick="document.getElementById('color-title').innerText='Color: ${c.name}'"></button>`;
+                });
+            }
+
+            productContainer.style.display = 'grid'; // Show the container
+        } else {
+            // Product not found, redirect to home
+            window.location.href = 'index.html';
+        }
     }
 
     // Update Social Links
