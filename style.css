@@ -365,26 +365,21 @@ nav.scrolled {
 }
 
 /* ── Focus Effect on Hover ── */
-.collection-grid:hover .collection-item {
-    opacity: 0.3;
-    filter: grayscale(1);
-}
-
-.collection-grid:hover .collection-item:hover {
-    opacity: 1;
-    transform: scale(1.03);
-    filter: grayscale(0);
-}
-
-.collection-item:nth-child(even) {
-    margin-top: 5rem;
-}
-
 .collection-item img {
     width: 100%;
     aspect-ratio: 3/4;
     object-fit: cover;
+    filter: brightness(0.6);
     transition: var(--transition-slow);
+}
+
+.collection-item:hover img {
+    filter: brightness(1);
+    transform: scale(1.05);
+}
+
+.collection-item:nth-child(even) {
+    margin-top: 5rem;
 }
 
 .collection-info {
