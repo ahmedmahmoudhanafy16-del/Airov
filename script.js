@@ -1,6 +1,44 @@
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
+// Loading Screen
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.querySelector('.loader-wrapper').classList.add('hidden');
+    }, 1000); // Small delay to let the animation play
+});
+
+// Custom Cursor (Desktop Only)
+if (!isMobile) {
+    const cursor = document.querySelector('.cursor');
+    const follower = document.querySelector('.cursor-follower');
+    
+    let posX = 0, posY = 0;
+    let mouseX = 0, mouseY = 0;
+    
+    // Track mouse
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursor.style.left = mouseX + 'px';
+        cursor.style.top = mouseY + 'px';
+    });
+    
+    // Smooth follower
+    setInterval(() => {
+        posX += (mouseX - posX) / 6;
+        posY += (mouseY - posY) / 6;
+        follower.style.left = posX + 'px';
+        follower.style.top = posY + 'px';
+    }, 16);
+    
+    // Hover effects
+    document.querySelectorAll('a, button, .collection-item, .ed-item').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+    });
+}
+
 // Hamburger Menu Logic
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');

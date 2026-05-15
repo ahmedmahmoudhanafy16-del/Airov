@@ -3,12 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIROV | Live Life Dynamically</title>
-    <meta name="description" content="AIROV - High-performance minimalist sportswear designed for a dynamic life. Inspired by urban athletics.">
+    <title>AIROV | Premium Urban Sportswear</title>
+    <meta name="description" content="AIROV - High-performance minimalist sportswear designed for a dynamic life. Discover the C.1 Series Spectrum.">
+    
+    <!-- Open Graph / Facebook / Instagram -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ahmedmahmoudhanafy16-del.github.io/Airov/">
+    <meta property="og:title" content="AIROV | Premium Urban Sportswear">
+    <meta property="og:description" content="High-performance minimalist sportswear designed for a dynamic life.">
+    <meta property="og:image" content="https://ahmedmahmoudhanafy16-del.github.io/Airov/assets/hero.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ahmedmahmoudhanafy16-del.github.io/Airov/">
+    <meta property="twitter:title" content="AIROV | Premium Urban Sportswear">
+    <meta property="twitter:description" content="High-performance minimalist sportswear designed for a dynamic life.">
+    <meta property="twitter:image" content="https://ahmedmahmoudhanafy16-del.github.io/Airov/assets/hero.png">
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
 
+    <!-- Loading Screen -->
+    <div class="loader-wrapper">
+        <div class="loader-logo">AIROV</div>
+    </div>
     <nav id="navbar">
         <div class="logo">
             <img src="assets/logo.jpg" alt="AIROV Logo" style="height: 35px; width: auto;">
@@ -31,13 +53,15 @@
     </nav>
 
     <header class="hero">
+        <video autoplay muted loop playsinline class="hero-video" poster="assets/hero.png">
+            <!-- Replace this link with your actual video link or local file like src="assets/hero-video.mp4" -->
+            <source src="https://cdn.pixabay.com/video/2020/05/21/40003-424835687_large.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
         <div class="hero-content" data-scroll-speed="2">
             <img src="assets/logo.jpg" alt="AIROV" class="hero-logo-large">
             <p class="hero-slogan">Live Life Dynamically</p>
             <a href="#collections" class="btn-large" style="font-size: 0.9rem; letter-spacing: 3px;">Discover C.1</a>
-        </div>
-        <div class="hero-img-container">
-            <img src="assets/hero.png" alt="AIROV Hero" class="hero-img">
         </div>
     </header>
 
@@ -45,7 +69,7 @@
         <div class="floating-title">PHILOSOPHY</div>
         <div class="asymmetric-grid">
             <div class="grid-image" data-scroll-speed="-1">
-                <img src="assets/black-jacket.png" alt="Product Shot">
+                <img src="assets/black-jacket.png" alt="Product Shot" loading="lazy">
             </div>
             <div class="grid-text">
                 <p style="text-transform: uppercase; letter-spacing: 5px; opacity: 0.4; margin-bottom: 1rem;">EST. 2024</p>
@@ -58,6 +82,19 @@
         </div>
     </section>
 
+    <!-- Lookbook / Editorial Section -->
+    <section class="section editorial-section">
+        <div class="editorial-header">
+            <h2 class="grid-title">Urban Aesthetic.</h2>
+            <p>Street photography & lifestyle shots that define the AIROV vision.</p>
+        </div>
+        <div class="editorial-gallery">
+            <div class="ed-item"><img src="assets/hero.png" alt="Look 1" loading="lazy"></div>
+            <div class="ed-item"><img src="assets/black-jacket.png" alt="Look 2" loading="lazy"></div>
+            <div class="ed-item"><img src="assets/pink-hoodie.png" alt="Look 3" loading="lazy"></div>
+        </div>
+    </section>
+
     <section class="section" id="collections">
         <div class="floating-title" style="right: -5%; top: 20%; color: rgba(255,255,255,0.02);">COLLECTION</div>
         <div class="collection-header">
@@ -66,30 +103,30 @@
         </div>
 
         <div class="collection-grid">
-            <div class="collection-item">
-                <img src="assets/pink-hoodie.png" alt="Spectrum Hoodie">
+            <a href="product.html" class="collection-item" style="text-decoration: none; color: inherit;">
+                <img src="assets/pink-hoodie.png" alt="Spectrum Hoodie" loading="lazy">
                 <div class="collection-info">
                     <h3 class="collection-name">Spectrum Hoodie</h3>
                     <p class="collection-price">Rose / EGP 1,850</p>
-                    <a href="https://ig.me/m/airov__" class="order-btn">Order via DM</a>
+                    <span class="order-btn">View Product</span>
                 </div>
-            </div>
-            <div class="collection-item">
-                <img src="assets/black-jacket.png" alt="Breathe Windbreaker">
+            </a>
+            <a href="product.html" class="collection-item" style="text-decoration: none; color: inherit;">
+                <img src="assets/black-jacket.png" alt="Breathe Windbreaker" loading="lazy">
                 <div class="collection-info">
                     <h3 class="collection-name">Breathe Windbreaker</h3>
                     <p class="collection-price">Onyx / EGP 2,400</p>
-                    <a href="https://ig.me/m/airov__" class="order-btn">Order via DM</a>
+                    <span class="order-btn">View Product</span>
                 </div>
-            </div>
-            <div class="collection-item">
-                <img src="assets/pink-hoodie.png" alt="Essential Tee" style="filter: brightness(0.6) grayscale(1);">
+            </a>
+            <a href="product.html" class="collection-item" style="text-decoration: none; color: inherit;">
+                <img src="assets/pink-hoodie.png" alt="Essential Tee" loading="lazy" style="filter: brightness(0.6) grayscale(1);">
                 <div class="collection-info">
                     <h3 class="collection-name">Essential Tee</h3>
                     <p class="collection-price">Ghost / EGP 850</p>
-                    <a href="https://ig.me/m/airov__" class="order-btn">Order via DM</a>
+                    <span class="order-btn">View Product</span>
                 </div>
-            </div>
+            </a>
         </div>
     </section>
 

@@ -26,6 +26,74 @@ body {
     line-height: 1.5;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    cursor: none; /* Hide default cursor */
+}
+
+/* Custom Cursor */
+.cursor {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--primary);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    transition: transform 0.1s;
+}
+
+.cursor-follower {
+    position: fixed;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+    transition: transform 0.3s ease, width 0.3s, height 0.3s, background 0.3s;
+}
+
+body.cursor-hover .cursor {
+    transform: translate(-50%, -50%) scale(0);
+}
+
+body.cursor-hover .cursor-follower {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: transparent;
+    backdrop-filter: blur(2px);
+}
+
+/* Loading Screen */
+.loader-wrapper {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 1s ease-in-out, visibility 1s;
+}
+
+.loader-logo {
+    font-family: var(--font-brand);
+    font-size: 3rem;
+    letter-spacing: 15px;
+    color: var(--primary);
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.loader-wrapper.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1); }
 }
 
 /* Custom Scroll */
@@ -99,51 +167,39 @@ nav.scrolled {
     opacity: 1;
 }
 
-/* Hero Section - Asymmetrical */
+/* Hero Section - Video Cinematic */
 .hero {
     height: 100vh;
     display: flex;
     align-items: center;
     position: relative;
     padding: 0 10%;
+    overflow: hidden;
+}
+
+.hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translateX(-50%) translateY(-50%);
+    z-index: 0;
+    object-fit: cover;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+    z-index: 1;
 }
 
 .hero-content {
     z-index: 2;
     max-width: 600px;
-}
-
-.hero-logo-large {
-    width: 400px;
-    max-width: 80vw;
-    margin-bottom: 2rem;
-    display: block;
-}
-
-.hero-slogan {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 2.5rem;
-    font-weight: 300;
-    margin-bottom: 3rem;
-    opacity: 0.8;
-}
-
-.hero-img-container {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 55%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.hero-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.7);
-    transition: var(--transition-slow);
 }
 
 /* Section Grid - Sandhill Inspiration */
@@ -207,6 +263,47 @@ nav.scrolled {
     pointer-events: none;
     z-index: -1;
     white-space: nowrap;
+}
+
+/* Editorial / Lookbook Section */
+.editorial-header {
+    text-align: center;
+    margin-bottom: 6rem;
+}
+
+.editorial-header p {
+    opacity: 0.5;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+.editorial-gallery {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 1rem;
+    height: 80vh;
+}
+
+.ed-item {
+    overflow: hidden;
+    position: relative;
+}
+
+.ed-item:nth-child(2) {
+    transform: translateY(3rem);
+}
+
+.ed-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6);
+    transition: var(--transition-slow);
+}
+
+.ed-item:hover img {
+    filter: brightness(1);
+    transform: scale(1.05);
 }
 
 /* Collection Header */
@@ -497,18 +594,18 @@ footer {
         margin-bottom: 2rem;
         line-height: 1.4;
     }
-    .hero-img-container {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        right: 0;
-        top: 0;
-        z-index: -1;
+    .hero-overlay {
+        background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 100%);
     }
-    .hero-img {
-        filter: brightness(0.35);
-        transform: none !important;
+
+    /* ── Editorial Section ── */
+    .editorial-gallery {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 2rem;
     }
+    .ed-item { height: 60vh; }
+    .ed-item:nth-child(2) { transform: none; }
 
     /* ── Sections - tighter spacing ── */
     .section { padding: 5rem 5%; }
