@@ -1,6 +1,63 @@
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
+// Render CMS Data
+function renderSiteData() {
+    if (typeof siteData === 'undefined') return;
+
+    // Render Hero
+    if (document.getElementById('dynamic-slogan')) {
+        document.getElementById('dynamic-slogan').innerText = siteData.hero.slogan;
+        document.getElementById('dynamic-hero-btn').innerText = siteData.hero.button_text;
+        document.getElementById('dynamic-hero-btn').href = siteData.hero.button_link;
+        document.getElementById('dynamic-hero-img').src = siteData.hero.image_path;
+    }
+
+    // Render Philosophy
+    if (document.getElementById('dynamic-phil-img')) {
+        document.getElementById('dynamic-phil-est').innerText = siteData.philosophy.established;
+        document.getElementById('dynamic-phil-title').innerText = siteData.philosophy.title;
+        document.getElementById('dynamic-phil-desc').innerText = siteData.philosophy.description;
+        document.getElementById('dynamic-phil-img').src = siteData.philosophy.image_path;
+    }
+
+    // Render Lookbook
+    const lookbookContainer = document.getElementById('lookbook-container');
+    if (lookbookContainer) {
+        siteData.lookbook.forEach(imgPath => {
+            lookbookContainer.innerHTML += `
+                <div class="ed-item">
+                    <img src="${imgPath}" alt="Lookbook Image" loading="lazy">
+                </div>
+            `;
+        });
+    }
+
+    // Render Products
+    const productsContainer = document.getElementById('products-container');
+    if (productsContainer) {
+        siteData.products.forEach(product => {
+            const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
+            productsContainer.innerHTML += `
+                <a href="product.html?id=${product.id}" class="collection-item" style="text-decoration: none; color: inherit;">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy">
+                    <div class="collection-info">
+                        <h3 class="collection-name">${product.name}</h3>
+                        <p class="collection-price">${product.color} / ${siteData.brand.currency} ${product.price}</p>
+                        <span class="order-btn">${statusLabel}</span>
+                    </div>
+                </a>
+            `;
+        });
+    }
+
+    // Update Social Links
+    document.querySelectorAll('.dm-link').forEach(el => el.href = siteData.brand.social.order_dm);
+}
+
+// Call renderer
+renderSiteData();
+
 // Loading Screen & Initial Animations
 window.addEventListener('load', () => {
     if (typeof gsap !== 'undefined') {
