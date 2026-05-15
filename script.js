@@ -95,9 +95,160 @@ function renderSiteData() {
     document.querySelectorAll('.dm-link').forEach(el => el.href = siteData.brand.social.order_dm);
 }
 
-// Call renderer
-renderSiteData();
+// ==========================================
+// CART SYSTEM
+// ==========================================
+let cart = JSON.parse(localStorage.getItem('airov_cart')) || [];
 
+function saveCart() {
+    localStorage.setItem('airov_cart', JSON.stringify(cart));
+    updateCartUI();
+}
+
+function updateCartUI() {
+    // Update Badge
+    const count = cart.reduce((total, item) => total + item.quantity, 0);
+    document.querySelectorAll('#cart-count, #cart-count-prod').forEach(el => el.innerText = count);
+
+    // Render Items
+    const cartItemsContainer = document.getElementById('cart-items');
+    if (!cartItemsContainer) return;
+
+    cartItemsContainer.innerHTML = '';
+    let total = 0;
+
+    if (cart.length === 0) {
+        cartItemsContainer.innerHTML = '<p style="opacity:0.5; text-align:center;">Your cart is empty.</p>';
+    } else {
+        cart.forEach((item, index) => {
+            total += item.price * item.quantity;
+            cartItemsContainer.innerHTML += `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p>${item.color} | Size: ${item.size}</p>
+                        <p>${item.quantity} x EGP ${item.price}</p>
+                    </div>
+                    <button class="cart-item-remove" onclick="removeFromCart(${index})">Remove</button>
+                </div>
+            `;
+        });
+    }
+
+    document.getElementById('cart-total-price').innerText = `EGP ${total}`;
+}
+
+window.removeFromCart = function(index) {
+    cart.splice(index, 1);
+    saveCart();
+};
+
+// Cart Toggle Logic
+const cartOverlay = document.getElementById('cart-overlay');
+const cartPanel = document.getElementById('cart-panel');
+const closeCartBtn = document.getElementById('close-cart');
+const cartToggleBtns = document.querySelectorAll('.cart-toggle-btn');
+
+function toggleCart() {
+    if(!cartOverlay) return;
+    cartOverlay.classList.toggle('active');
+    cartPanel.classList.toggle('active');
+    document.body.style.overflow = cartPanel.classList.contains('active') ? 'hidden' : '';
+}
+
+cartToggleBtns.forEach(btn => btn.addEventListener('click', toggleCart));
+if(closeCartBtn) closeCartBtn.addEventListener('click', toggleCart);
+if(cartOverlay) cartOverlay.addEventListener('click', toggleCart);
+
+// Checkout via WhatsApp
+const checkoutBtn = document.getElementById('checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) return alert('Your cart is empty.');
+        let message = "Hello AIROV, I would like to order:\n\n";
+        let total = 0;
+        cart.forEach(item => {
+            message += `- ${item.name} (${item.color}, Size: ${item.size}) x${item.quantity} = EGP ${item.price * item.quantity}\n`;
+            total += item.price * item.quantity;
+        });
+        message += `\nTotal: EGP ${total}\n`;
+        const waLink = `https://wa.me/201000000000?text=${encodeURIComponent(message)}`;
+        window.open(waLink, '_blank');
+    });
+}
+
+// Add to Cart from Product Page
+const addToCartBtn = document.getElementById('add-to-cart-btn');
+if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+        const product = siteData.products.find(p => p.id === productId);
+        
+        if (product) {
+            // Get selected size
+            let selectedSize = 'M'; // Default
+            const activeSizeBtn = document.querySelector('.size-btn.active');
+            if (activeSizeBtn) selectedSize = activeSizeBtn.innerText;
+
+            // Get selected color
+            let selectedColor = product.colors && product.colors.length > 0 ? product.colors[0].name : '';
+            const colorTitle = document.getElementById('color-title').innerText;
+            if (colorTitle.includes('Color: ')) {
+                selectedColor = colorTitle.replace('Color: ', '');
+            }
+
+            // Check if already in cart
+            const existingItem = cart.find(item => item.id === product.id && item.size === selectedSize && item.color === selectedColor);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    size: selectedSize,
+                    color: selectedColor,
+                    quantity: 1
+                });
+            }
+
+            saveCart();
+            
+            // Show cart and play a small GSAP bounce if available
+            toggleCart();
+            if (typeof gsap !== 'undefined') {
+                gsap.fromTo('.cart-panel', { x: 50 }, { x: 0, duration: 0.4, ease: "back.out(1.5)" });
+            }
+        }
+    });
+}
+
+// Handle Size Selection Highlighting
+document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+    });
+});
+
+// Handle Color Selection Highlighting
+document.querySelectorAll('.color-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+    });
+});
+
+// Initialize Cart UI on load
+updateCartUI();
+
+// ==========================================
+// ANIMATIONS & MENUS
+// ==========================================
 // Loading Screen & Initial Animations
 window.addEventListener('load', () => {
     if (typeof gsap !== 'undefined') {

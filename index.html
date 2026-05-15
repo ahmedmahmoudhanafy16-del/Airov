@@ -47,7 +47,9 @@
                 <li><a href="https://www.instagram.com/airov__/">Instagram</a></li>
             </ul>
             <div class="nav-extra">
-                <a href="https://ig.me/m/airov__" class="dm-link">Order via DM</a>
+                <button class="cart-toggle-btn" id="cart-toggle-btn" style="background: none; border: none; color: var(--primary); cursor: pointer; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
+                    Cart (<span id="cart-count">0</span>)
+                </button>
             </div>
         </div>
     </nav>
@@ -110,7 +112,7 @@
 
     <footer>
         <div class="logo">
-            <img src="assets/logo.jpg" alt="AIROV Logo" style="height: 30px; width: auto;">
+            <img src="assets/logo.jpg" alt="AIROV Logo" style="height: 30px; width: auto; mix-blend-mode: screen;">
         </div>
         <div class="footer-nav">
             <div>
@@ -139,6 +141,25 @@
             </div>
         </div>
     </footer>
+
+    <!-- Cart Overlay & Panel -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <div class="cart-panel" id="cart-panel">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="close-cart" id="close-cart">✕</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <!-- Cart items injected here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cart-total-price">EGP 0</span>
+            </div>
+            <button class="btn-large checkout-btn" id="checkout-btn" style="width: 100%; text-align: center;">Checkout via WhatsApp</button>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="data.js"></script>

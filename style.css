@@ -778,3 +778,115 @@ footer {
         gap: 1.5rem;
     }
 }
+
+/* ── Cart Panel Styles ── */
+.cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    z-index: 10001;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease;
+}
+.cart-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cart-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: var(--bg-dark);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cart-panel.active {
+    right: 0;
+}
+
+@media (max-width: 450px) {
+    .cart-panel {
+        width: 100%;
+        right: -100%;
+    }
+}
+
+.cart-header {
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.cart-header h2 {
+    font-family: var(--font-brand);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+}
+.close-cart {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.cart-item {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 1rem;
+    align-items: center;
+}
+.cart-item img {
+    width: 100%;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+}
+.cart-item-details h4 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+}
+.cart-item-details p {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: var(--accent-pink);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.cart-footer {
+    padding: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    font-family: var(--font-brand);
+}
