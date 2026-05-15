@@ -167,41 +167,18 @@ nav.scrolled {
     opacity: 1;
 }
 
-/* Hero Section - Video Cinematic */
+/* Hero Section - Asymmetrical */
 .hero {
     height: 100vh;
     display: flex;
     align-items: center;
     position: relative;
     padding: 0 10%;
-    overflow: hidden;
-}
-
-.hero-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translateX(-50%) translateY(-50%);
-    z-index: 0;
-    object-fit: cover;
-}
-
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
-    z-index: 1;
 }
 
 .hero-content {
     z-index: 2;
     max-width: 600px;
-    text-align: center;
-    margin: 0 auto;
 }
 
 .hero-logo-large {
@@ -209,8 +186,6 @@ nav.scrolled {
     max-width: 80vw;
     margin-bottom: 2rem;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .hero-slogan {
@@ -220,6 +195,23 @@ nav.scrolled {
     font-weight: 300;
     margin-bottom: 3rem;
     opacity: 0.8;
+}
+
+.hero-img-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 55%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7);
+    transition: var(--transition-slow);
 }
 
 /* Section Grid - Sandhill Inspiration */
@@ -617,8 +609,17 @@ footer {
         margin-bottom: 2rem;
         line-height: 1.4;
     }
-    .hero-overlay {
-        background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 100%);
+    .hero-img-container {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        right: 0;
+        top: 0;
+        z-index: -1;
+    }
+    .hero-img {
+        filter: brightness(0.35);
+        transform: none !important;
     }
 
     /* ── Editorial Section ── */
