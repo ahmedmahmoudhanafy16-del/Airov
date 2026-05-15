@@ -1,28 +1,6 @@
-// ==========================================
-// AIROV ADMIN DASHBOARD LOGIC
-// ==========================================
-/* 
-    Firebase Integration placeholder:
-    To make this truly real-time and store multiple images in the cloud,
-    you must create a Firebase Project (firestore & storage) and paste the config here:
-    
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-    
-    const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "SENDER_ID",
-        appId: "APP_ID"
-    };
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-*/
-
-// For now, we simulate the database connection using localStorage so you can see the UI working.
-let productsDB = JSON.parse(localStorage.getItem('airov_db_products')) || [];
+import { db, storage } from '../firebase-config.js';
+import { collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 // UI Elements
 const loginScreen = document.getElementById('login-screen');
@@ -39,11 +17,12 @@ const closeModalBtns = document.querySelectorAll('.close-modal');
 const productForm = document.getElementById('product-form');
 const productsTbody = document.getElementById('products-tbody');
 
-// Login Logic (Mock)
+let selectedFiles = [];
+
+// Login Logic (Mock for now, can use Firebase Auth later)
 loginBtn.addEventListener('click', () => {
     const email = document.getElementById('admin-email').value;
     const pass = document.getElementById('admin-pass').value;
-    // Simple mock auth
     if (email === 'admin@airov.com' && pass === 'admin123') {
         loginScreen.classList.add('hidden');
         dashboardContainer.classList.remove('hidden');
@@ -77,6 +56,7 @@ navBtns.forEach(btn => {
 // Modal Logic
 showAddProductBtn.addEventListener('click', () => {
     productForm.reset();
+    selectedFiles = [];
     document.getElementById('image-preview').innerHTML = '';
     document.getElementById('modal-title').innerText = 'Add New Product';
     productModal.classList.remove('hidden');
@@ -88,12 +68,13 @@ closeModalBtns.forEach(btn => {
     });
 });
 
-// Image Preview Logic (Simulating multiple uploads)
+// Image Preview Logic
 document.getElementById('prod-images').addEventListener('change', function(e) {
     const previewContainer = document.getElementById('image-preview');
     previewContainer.innerHTML = '';
+    selectedFiles = Array.from(this.files);
     
-    Array.from(this.files).forEach(file => {
+    selectedFiles.forEach(file => {
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = document.createElement('img');
@@ -104,67 +85,100 @@ document.getElementById('prod-images').addEventListener('change', function(e) {
     });
 });
 
-// Save Product Logic
-productForm.addEventListener('submit', (e) => {
+// Save Product Logic (Uploads to Firebase)
+productForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
-    // In a real app, images would be uploaded to Firebase Storage here, returning URLs.
-    // We will just use a placeholder image for the local simulation.
-    
-    const newProduct = {
-        id: 'prod_' + Date.now(),
-        name: document.getElementById('prod-name').value,
-        description: document.getElementById('prod-desc').value,
-        price: Number(document.getElementById('prod-price').value),
-        category: document.getElementById('prod-category').value,
-        colors: document.getElementById('prod-colors').value.split(',').map(c => c.trim()),
-        stock: {
-            S: Number(document.getElementById('qty-S').value),
-            M: Number(document.getElementById('qty-M').value),
-            L: Number(document.getElementById('qty-L').value),
-            XL: Number(document.getElementById('qty-XL').value)
-        },
-        image: '../assets/black-jacket.png' // Simulated Cloud Storage URL
-    };
-    
-    productsDB.push(newProduct);
-    localStorage.setItem('airov_db_products', JSON.stringify(productsDB));
-    
-    productModal.classList.add('hidden');
-    renderProducts();
+    const submitBtn = productForm.querySelector('button[type="submit"]');
+    submitBtn.innerText = "Uploading...";
+    submitBtn.disabled = true;
+
+    try {
+        let imageUrl = '../assets/black-jacket.png'; // Fallback
+        
+        // Upload first image to Firebase Storage if selected
+        if (selectedFiles.length > 0) {
+            const file = selectedFiles[0];
+            const storageRef = ref(storage, 'products/' + Date.now() + '_' + file.name);
+            await uploadBytes(storageRef, file);
+            imageUrl = await getDownloadURL(storageRef);
+        }
+
+        const newProduct = {
+            name: document.getElementById('prod-name').value,
+            description: document.getElementById('prod-desc').value,
+            price: Number(document.getElementById('prod-price').value),
+            category: document.getElementById('prod-category').value,
+            colors: document.getElementById('prod-colors').value.split(',').map(c => c.trim()),
+            stock: {
+                S: Number(document.getElementById('qty-S').value),
+                M: Number(document.getElementById('qty-M').value),
+                L: Number(document.getElementById('qty-L').value),
+                XL: Number(document.getElementById('qty-XL').value)
+            },
+            image: imageUrl,
+            in_stock: true,
+            createdAt: new Date()
+        };
+        
+        // Add to Firestore
+        await addDoc(collection(db, "products"), newProduct);
+        
+        productModal.classList.add('hidden');
+        renderProducts();
+    } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("Failed to upload product. Check Firebase keys and rules.");
+    } finally {
+        submitBtn.innerText = "Save Product";
+        submitBtn.disabled = false;
+    }
 });
 
-// Render Products Table
-function renderProducts() {
-    productsTbody.innerHTML = '';
+// Render Products from Firestore
+async function renderProducts() {
+    productsTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading products from Database...</td></tr>';
     
-    if (productsDB.length === 0) {
-        productsTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; opacity:0.5;">No products yet. Add one!</td></tr>';
-        return;
+    try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        productsTbody.innerHTML = '';
+        
+        if (querySnapshot.empty) {
+            productsTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; opacity:0.5;">No products yet. Add one!</td></tr>';
+            return;
+        }
+
+        querySnapshot.forEach((docSnap) => {
+            const p = docSnap.data();
+            const pid = docSnap.id;
+            const totalStock = p.stock ? (p.stock.S + p.stock.M + p.stock.L + p.stock.XL) : 0;
+            productsTbody.innerHTML += `
+                <tr>
+                    <td><img src="${p.image}" alt="${p.name}"></td>
+                    <td>${p.name}</td>
+                    <td><span style="background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:4px; font-size:0.8rem;">${p.category}</span></td>
+                    <td>EGP ${p.price}</td>
+                    <td>${totalStock} Units</td>
+                    <td>
+                        <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteProduct('${pid}')">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+    } catch (error) {
+        console.error("Error getting documents: ", error);
+        productsTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Database Connection Error. Did you add the API Keys?</td></tr>';
     }
-    
-    productsDB.forEach((p, index) => {
-        const totalStock = p.stock.S + p.stock.M + p.stock.L + p.stock.XL;
-        productsTbody.innerHTML += `
-            <tr>
-                <td><img src="${p.image}" alt="${p.name}"></td>
-                <td>${p.name}</td>
-                <td><span style="background:rgba(255,255,255,0.1); padding:0.2rem 0.5rem; border-radius:4px; font-size:0.8rem;">${p.category}</span></td>
-                <td>EGP ${p.price}</td>
-                <td>${totalStock} Units</td>
-                <td>
-                    <button class="btn-secondary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" onclick="deleteProduct(${index})">Delete</button>
-                </td>
-            </tr>
-        `;
-    });
 }
 
 // Delete Logic
-window.deleteProduct = function(index) {
-    if(confirm('Are you sure you want to delete this product?')) {
-        productsDB.splice(index, 1);
-        localStorage.setItem('airov_db_products', JSON.stringify(productsDB));
-        renderProducts();
+window.deleteProduct = async function(pid) {
+    if(confirm('Are you sure you want to delete this product from the database?')) {
+        try {
+            await deleteDoc(doc(db, "products", pid));
+            renderProducts();
+        } catch(error) {
+            console.error("Error deleting document: ", error);
+            alert("Error deleting product.");
+        }
     }
 }

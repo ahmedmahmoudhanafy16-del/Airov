@@ -1,12 +1,29 @@
+import { db } from './firebase-config.js';
+import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
-// Render CMS Data
-function renderSiteData() {
-    if (typeof siteData === 'undefined') return;
+// Global products cache for search/filter without re-fetching
+let productsCache = [];
 
-    // Render Hero
-    if (document.getElementById('dynamic-slogan')) {
+// Render CMS Data
+async function renderSiteData() {
+    // 1. Fetch Products from Firebase
+    try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        productsCache = [];
+        querySnapshot.forEach((docSnap) => {
+            productsCache.push({ id: docSnap.id, ...docSnap.data() });
+        });
+    } catch (error) {
+        console.error("Firebase fetch error:", error);
+        // Fallback to local data if firebase fails or keys missing
+        if (typeof siteData !== 'undefined') productsCache = siteData.products;
+    }
+
+    // Render Hero (from siteData fallback or hardcoded for now)
+    if (document.getElementById('dynamic-slogan') && typeof siteData !== 'undefined') {
         document.getElementById('dynamic-slogan').innerText = siteData.hero.slogan;
         document.getElementById('dynamic-hero-btn').innerText = siteData.hero.button_text;
         document.getElementById('dynamic-hero-btn').href = siteData.hero.button_link;
@@ -14,7 +31,7 @@ function renderSiteData() {
     }
 
     // Render Philosophy
-    if (document.getElementById('dynamic-phil-img')) {
+    if (document.getElementById('dynamic-phil-img') && typeof siteData !== 'undefined') {
         document.getElementById('dynamic-phil-est').innerText = siteData.philosophy.established;
         document.getElementById('dynamic-phil-title').innerText = siteData.philosophy.title;
         document.getElementById('dynamic-phil-desc').innerText = siteData.philosophy.description;
@@ -23,7 +40,8 @@ function renderSiteData() {
 
     // Render Lookbook
     const lookbookContainer = document.getElementById('lookbook-container');
-    if (lookbookContainer) {
+    if (lookbookContainer && typeof siteData !== 'undefined') {
+        lookbookContainer.innerHTML = '';
         siteData.lookbook.forEach(imgPath => {
             lookbookContainer.innerHTML += `
                 <div class="ed-item">
@@ -40,25 +58,33 @@ function renderSiteData() {
             productsContainer.innerHTML = '';
             
             const filteredProducts = filterCategory === 'all' 
-                ? siteData.products 
-                : siteData.products.filter(p => p.category === filterCategory);
+                ? productsCache 
+                : productsCache.filter(p => p.category === filterCategory);
+
+            if (filteredProducts.length === 0) {
+                productsContainer.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.5; padding: 2rem;">No products found in this category.</p>';
+            }
 
             filteredProducts.forEach(product => {
                 const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
-                const colorName = product.colors && product.colors.length > 0 ? product.colors[0].name : '';
+                // Handle different color formats
+                let colorName = '';
+                if (product.colors && product.colors.length > 0) {
+                    colorName = typeof product.colors[0] === 'string' ? product.colors[0] : product.colors[0].name;
+                }
+                
                 productsContainer.innerHTML += `
                     <a href="product.html?id=${product.id}" class="collection-item" style="text-decoration: none; color: inherit;">
                         <img src="${product.image}" alt="${product.name}" loading="lazy">
                         <div class="collection-info">
                             <h3 class="collection-name">${product.name}</h3>
-                            <p class="collection-price">${colorName} / ${siteData.brand.currency} ${product.price}</p>
+                            <p class="collection-price">${colorName} / EGP ${product.price}</p>
                             <span class="order-btn">${statusLabel}</span>
                         </div>
                     </a>
                 `;
             });
             
-            // Re-trigger scroll animations for new items if GSAP is loaded
             if (typeof ScrollTrigger !== 'undefined') {
                 ScrollTrigger.refresh();
             }
@@ -82,15 +108,24 @@ function renderSiteData() {
     if (productContainer) {
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
-        const product = siteData.products.find(p => p.id === productId);
+        
+        // Find in cache or fetch single from DB
+        let product = productsCache.find(p => p.id === productId);
+        
+        if (!product && productId) {
+            try {
+                const docRef = doc(db, "products", productId);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) product = { id: docSnap.id, ...docSnap.data() };
+            } catch (e) { console.error(e); }
+        }
 
         if (product) {
             document.getElementById('product-title').innerText = product.name;
             document.getElementById('product-breadcrumb-name').innerText = product.name;
-            document.getElementById('product-price').innerText = `${siteData.brand.currency} ${product.price}`;
+            document.getElementById('product-price').innerText = `EGP ${product.price}`;
             document.getElementById('product-desc').innerText = product.description;
 
-            // Render Gallery (simple mockup with 3 images of the same product)
             const gallery = document.getElementById('product-gallery');
             gallery.innerHTML = `
                 <img src="${product.image}" alt="${product.name} Front" loading="lazy">
@@ -98,27 +133,31 @@ function renderSiteData() {
                 <img src="${product.image}" alt="${product.name} Detail 2" loading="lazy" style="transform: scaleX(-1);">
             `;
 
-            // Render Colors
             const colorSelector = document.getElementById('color-selector');
             const colorTitle = document.getElementById('color-title');
             colorSelector.innerHTML = '';
             if (product.colors && product.colors.length > 0) {
-                colorTitle.innerText = `Color: ${product.colors[0].name}`;
+                const firstColor = typeof product.colors[0] === 'string' ? product.colors[0] : product.colors[0].name;
+                colorTitle.innerText = `Color: ${firstColor}`;
                 product.colors.forEach((c, index) => {
-                    colorSelector.innerHTML += `<button class="color-btn ${index === 0 ? 'active' : ''}" style="background-color: ${c.hex};" onclick="document.getElementById('color-title').innerText='Color: ${c.name}'"></button>`;
+                    const cName = typeof c === 'string' ? c : c.name;
+                    const cHex = typeof c === 'string' ? '#333' : c.hex;
+                    colorSelector.innerHTML += `<button class="color-btn ${index === 0 ? 'active' : ''}" style="background-color: ${cHex};" onclick="document.getElementById('color-title').innerText='Color: ${cName}'"></button>`;
                 });
             }
 
-            productContainer.style.display = 'grid'; // Show the container
-        } else {
-            // Product not found, redirect to home
-            window.location.href = 'index.html';
+            productContainer.style.display = 'grid';
         }
     }
 
     // Update Social Links
-    document.querySelectorAll('.dm-link').forEach(el => el.href = siteData.brand.social.order_dm);
+    if (typeof siteData !== 'undefined') {
+        document.querySelectorAll('.dm-link').forEach(el => el.href = siteData.brand.social.order_dm);
+    }
 }
+
+// Call renderer
+renderSiteData();
 
 // ==========================================
 // CART SYSTEM
