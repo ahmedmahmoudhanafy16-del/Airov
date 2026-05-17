@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Account | AIROV</title>
+    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header {
+            padding: 10rem 5% 3rem;
+            text-align: center;
+        }
+        .auth-container {
+            max-width: 400px;
+            margin: 0 auto 5rem;
+            padding: 2rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .dashboard-container {
+            max-width: 1000px;
+            margin: 0 auto 5rem;
+            display: none; /* Shown via JS */
+            grid-template-columns: 250px 1fr;
+            gap: 3rem;
+        }
+        .dashboard-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .dashboard-nav button {
+            background: transparent;
+            border: none;
+            color: white;
+            text-align: left;
+            padding: 1rem;
+            cursor: pointer;
+            border-left: 2px solid transparent;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        .dashboard-nav button.active, .dashboard-nav button:hover {
+            opacity: 1;
+            border-left-color: var(--primary);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        label { display: block; font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.5rem; }
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-family: var(--font-sans);
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+
+        .order-card {
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .status-badge {
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .status-pending { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+        .status-delivered { background: rgba(46, 204, 113, 0.2); color: #2ecc71; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-nav {
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .dashboard-nav button {
+                border-left: none;
+                border-bottom: 2px solid transparent;
+                white-space: nowrap;
+            }
+            .dashboard-nav button.active {
+                border-left-color: transparent;
+                border-bottom-color: var(--primary);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="assets/logo.jpg" alt="AIROV Logo" style="height: 35px; width: auto;">
+            </a>
+        </div>
+        <div class="nav-extra" style="display: flex; gap: 1.5rem; align-items: center; position: absolute; right: 5%;">
+            <a href="wishlist.html" class="icon-btn" style="color: var(--primary); font-size: 1.2rem; text-decoration: none;"><i class="far fa-heart"></i></a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <h1 style="font-family: var(--font-serif); font-size: 3rem;">My Account</h1>
+    </div>
+
+    <!-- Auth Forms (Login/Register) -->
+    <div class="auth-container" id="auth-container">
+        <div id="login-form">
+            <h2 style="margin-bottom: 2rem;">Login</h2>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="Email" value="demo@airov.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Password" value="password">
+            </div>
+            <button class="btn-large" style="width: 100%;" onclick="login()">Sign In</button>
+            <p style="margin-top: 1.5rem; font-size: 0.8rem; text-align: center;">
+                Don't have an account? <a href="#" style="color: var(--primary);" onclick="document.getElementById('login-form').style.display='none'; document.getElementById('register-form').style.display='block'; return false;">Register</a>
+            </p>
+        </div>
+
+        <div id="register-form" style="display: none;">
+            <h2 style="margin-bottom: 2rem;">Create Account</h2>
+            <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="reg-fname" placeholder="First Name">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="reg-password" placeholder="Password">
+            </div>
+            <button class="btn-large" style="width: 100%;" onclick="register()">Register</button>
+            <p style="margin-top: 1.5rem; font-size: 0.8rem; text-align: center;">
+                Already have an account? <a href="#" style="color: var(--primary);" onclick="document.getElementById('register-form').style.display='none'; document.getElementById('login-form').style.display='block'; return false;">Login</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div class="dashboard-container" id="dashboard-container">
+        <aside class="dashboard-nav">
+            <button class="active" onclick="switchTab('orders')">Order History</button>
+            <button onclick="switchTab('addresses')">Addresses</button>
+            <button onclick="switchTab('profile')">Profile Details</button>
+            <button onclick="logout()" style="color: #e74c3c;">Logout</button>
+        </aside>
+
+        <main class="dashboard-content">
+            <div id="tab-orders" class="tab-content active">
+                <h2 style="margin-bottom: 2rem;">Order History</h2>
+                <div id="orders-list">
+                    <!-- Orders injected via JS -->
+                </div>
+            </div>
+
+            <div id="tab-addresses" class="tab-content">
+                <h2 style="margin-bottom: 2rem;">Saved Addresses</h2>
+                <p style="opacity: 0.6;">No addresses saved yet.</p>
+                <button class="btn-large" style="margin-top: 1rem; font-size: 0.8rem; padding: 0.8rem 1.5rem;">Add New Address</button>
+            </div>
+
+            <div id="tab-profile" class="tab-content">
+                <h2 style="margin-bottom: 2rem;">Profile Details</h2>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="prof-name" value="Demo User" disabled>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="prof-email" value="demo@airov.com" disabled>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple Auth Simulation using LocalStorage
+        let currentUser = JSON.parse(localStorage.getItem('airov_user'));
+        const authContainer = document.getElementById('auth-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+
+        function checkAuth() {
+            if (currentUser) {
+                authContainer.style.display = 'none';
+                dashboardContainer.style.display = 'grid';
+                renderOrders();
+                document.getElementById('prof-name').value = currentUser.name;
+                document.getElementById('prof-email').value = currentUser.email;
+            } else {
+                authContainer.style.display = 'block';
+                dashboardContainer.style.display = 'none';
+            }
+        }
+
+        function login() {
+            // Mock login - bypasses actual validation for demo
+            currentUser = { name: 'Demo User', email: document.getElementById('login-email').value };
+            localStorage.setItem('airov_user', JSON.stringify(currentUser));
+            checkAuth();
+        }
+
+        function register() {
+            const fname = document.getElementById('reg-fname').value;
+            const email = document.getElementById('reg-email').value;
+            if(!fname || !email) return alert("Please fill details");
+            currentUser = { name: fname, email: email };
+            localStorage.setItem('airov_user', JSON.stringify(currentUser));
+            checkAuth();
+        }
+
+        function logout() {
+            localStorage.removeItem('airov_user');
+            currentUser = null;
+            checkAuth();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.dashboard-nav button').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function renderOrders() {
+            const orders = JSON.parse(localStorage.getItem('airov_orders')) || [];
+            const list = document.getElementById('orders-list');
+            list.innerHTML = '';
+
+            if (orders.length === 0) {
+                list.innerHTML = '<p style="opacity:0.6;">You have not placed any orders yet.</p>';
+                return;
+            }
+
+            // Reverse to show newest first
+            orders.reverse().forEach(order => {
+                let itemsHTML = '';
+                order.items.forEach(i => {
+                    itemsHTML += `<div style="display:flex; justify-content:space-between; margin-top:0.5rem; font-size:0.8rem; opacity:0.8;">
+                        <span>${i.quantity}x ${i.name} (${i.size})</span>
+                        <span>EGP ${i.price * i.quantity}</span>
+                    </div>`;
+                });
+
+                list.innerHTML += `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div>
+                                <h3 style="margin-bottom:0.2rem;">Order ${order.id}</h3>
+                                <p style="font-size:0.8rem; opacity:0.6;">Placed on ${order.date}</p>
+                            </div>
+                            <div>
+                                <span class="status-badge ${order.status.toLowerCase() === 'pending' ? 'status-pending' : 'status-delivered'}">${order.status}</span>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1.5rem;">
+                            ${itemsHTML}
+                        </div>
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; display: flex; justify-content: space-between; font-weight: bold;">
+                            <span>Total</span>
+                            <span>EGP ${order.total}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Init
+        checkAuth();
+    </script>
+</body>
+</html>

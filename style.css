@@ -739,6 +739,13 @@ footer {
         grid-template-columns: 1fr 1fr;
         gap: 0.8rem;
     }
+    .collection-item {
+        position: relative;
+    }
+    .collection-item:hover .quick-add-overlay {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
     .collection-item:nth-child(even) {
         margin-top: 1.5rem;
     }
@@ -940,6 +947,49 @@ footer {
     font-size: 1.2rem;
     text-transform: uppercase;
     font-family: var(--font-brand);
+}
+
+/* Global Collection Item Hover States */
+.collection-item {
+    position: relative;
+}
+.collection-item:hover .quick-add-overlay {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+.wishlist-btn:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+.wishlist-btn.active i {
+    font-weight: 900;
+    color: var(--accent-pink);
+}
+
+/* Quick Add Modal */
+.quick-add-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    z-index: 10005;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+.quick-add-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+.quick-add-content {
+    background: var(--bg-dark);
+    padding: 2rem;
+    border: 1px solid rgba(255,255,255,0.1);
+    width: 90%;
+    max-width: 400px;
+    position: relative;
 }
 
 /* Hide custom cursor on mobile touch devices */

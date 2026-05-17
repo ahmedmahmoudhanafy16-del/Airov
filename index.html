@@ -20,6 +20,8 @@
     <meta property="twitter:description" content="High-performance minimalist sportswear designed for a dynamic life.">
     <meta property="twitter:image" content="https://ahmedmahmoudhanafy16-del.github.io/Airov/assets/hero.png">
 
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
@@ -46,7 +48,16 @@
                 <li><a href="#about">Philosophy</a></li>
                 <li><a href="https://www.instagram.com/airov__/">Instagram</a></li>
             </ul>
-            <div class="nav-extra">
+            <div class="nav-extra" style="display: flex; gap: 1.5rem; align-items: center;">
+                <button id="search-toggle-btn" class="icon-btn" aria-label="Search" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1.2rem;">
+                    <i class="fas fa-search"></i>
+                </button>
+                <a href="wishlist.html" id="wishlist-btn" class="icon-btn" aria-label="Wishlist" style="color: var(--primary); font-size: 1.2rem; text-decoration: none;">
+                    <i class="far fa-heart"></i>
+                </a>
+                <a href="account.html" id="account-btn" class="icon-btn" aria-label="Account" style="color: var(--primary); font-size: 1.2rem; text-decoration: none;">
+                    <i class="far fa-user"></i>
+                </a>
                 <button class="cart-toggle-btn" id="cart-toggle-btn" style="background: none; border: none; color: var(--primary); cursor: pointer; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px;">
                     Cart (<span id="cart-count">0</span>)
                 </button>
@@ -65,6 +76,14 @@
         </div>
     </header>
 
+    <!-- New Arrivals Strip -->
+    <section class="section" id="new-arrivals" style="padding-top: 5rem; padding-bottom: 2rem; overflow: hidden;">
+        <h2 class="grid-title" style="margin-left: 5%; margin-bottom: 2rem;">New Arrivals.</h2>
+        <div class="horizontal-strip" id="new-arrivals-container" style="display: flex; gap: 1rem; overflow-x: auto; padding: 0 5%; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;">
+            <!-- Rendered via JS -->
+        </div>
+    </section>
+
     <section class="section">
         <div class="floating-title">PHILOSOPHY</div>
         <div class="asymmetric-grid">
@@ -81,6 +100,15 @@
             </div>
         </div>
     </section>
+
+    <!-- Bestsellers Grid -->
+    <section class="section" id="bestsellers" style="background-color: var(--bg-accent);">
+        <h2 class="grid-title" style="text-align: center; margin-bottom: 4rem;">Bestsellers.</h2>
+        <div class="collection-grid" id="bestsellers-container">
+            <!-- Rendered via JS -->
+        </div>
+    </section>
+
 
     <!-- Lookbook / Editorial Section -->
     <section class="section editorial-section">
@@ -102,17 +130,68 @@
             </p>
         </div>
 
-        <div class="filter-container" id="filter-container" style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="hoodies">Hoodies</button>
-            <button class="filter-btn" data-filter="jackets">Jackets</button>
-            <button class="filter-btn" data-filter="tees">Tees</button>
-        </div>
+        <div class="filter-layout" style="display: flex; gap: 2rem; margin-bottom: 2rem; align-items: flex-start;">
+            <!-- Advanced Filter Sidebar -->
+            <aside class="filter-sidebar" id="filter-sidebar" style="flex: 0 0 250px; border-right: 1px solid rgba(255,255,255,0.1); padding-right: 1rem;">
+                <h3 style="margin-bottom: 1rem; font-size: 1rem;">Filters</h3>
+                
+                <div class="filter-group" style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.5rem;">Category</h4>
+                    <button class="filter-btn active" data-filter="all" style="display: block; width: 100%; text-align: left; background: none; border: none; color: white; padding: 0.5rem 0; cursor: pointer;">All</button>
+                    <button class="filter-btn" data-filter="hoodies" style="display: block; width: 100%; text-align: left; background: none; border: none; color: white; padding: 0.5rem 0; cursor: pointer;">Hoodies</button>
+                    <button class="filter-btn" data-filter="jackets" style="display: block; width: 100%; text-align: left; background: none; border: none; color: white; padding: 0.5rem 0; cursor: pointer;">Jackets</button>
+                    <button class="filter-btn" data-filter="tees" style="display: block; width: 100%; text-align: left; background: none; border: none; color: white; padding: 0.5rem 0; cursor: pointer;">Tees</button>
+                </div>
 
-        <div class="collection-grid" id="products-container">
-            <!-- Dynamically populated from data.js -->
+                <div class="filter-group" style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.5rem;">Sort By</h4>
+                    <select id="sort-select" style="width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 0.5rem; font-family: var(--font-sans);">
+                        <option value="newest" style="background: var(--bg-dark);">Newest</option>
+                        <option value="price-low" style="background: var(--bg-dark);">Price: Low to High</option>
+                        <option value="price-high" style="background: var(--bg-dark);">Price: High to Low</option>
+                        <option value="bestsellers" style="background: var(--bg-dark);">Bestsellers</option>
+                    </select>
+                </div>
+                <!-- Price slider and other filters can be expanded here -->
+            </aside>
+
+            <!-- Product Grid Container -->
+            <div style="flex: 1;">
+                <button id="mobile-filter-toggle" class="btn-large" style="display: none; width: 100%; margin-bottom: 1rem;">Filter & Sort</button>
+                <div class="collection-grid" id="products-container" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
+                    <!-- Dynamically populated from data.js -->
+                </div>
+            </div>
         </div>
     </section>
+
+    <!-- Trending Now -->
+    <section class="section" id="trending-now" style="background-color: var(--bg-accent);">
+        <h2 class="grid-title" style="text-align: center; margin-bottom: 4rem;">Trending <i class="fas fa-fire" style="color: var(--accent-pink);"></i></h2>
+        <div class="collection-grid" id="trending-container">
+            <!-- Rendered via JS -->
+        </div>
+    </section>
+
+    <!-- Wear It Your Way (UGC) -->
+    <section class="section" id="ugc-section">
+        <div class="editorial-header" style="text-align: center;">
+            <h2 class="grid-title">Wear It Your Way.</h2>
+            <p style="opacity: 0.6; margin-top: 1rem;">Tag @airov__ to be featured.</p>
+        </div>
+        <div class="editorial-gallery" id="ugc-container" style="margin-top: 3rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <!-- Placeholder UGC Images -->
+            <img src="assets/black-jacket.png" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+            <img src="assets/pink-hoodie.png" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+            <img src="assets/hero.png" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+            <img src="assets/black-jacket.png" style="width: 100%; aspect-ratio: 1/1; object-fit: cover;">
+        </div>
+        <div style="text-align: center; margin-top: 3rem;">
+            <input type="text" placeholder="@your_instagram" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 1rem; width: 250px; font-family: var(--font-sans); outline: none;">
+            <button class="btn-large" style="padding: 1rem 2rem; border-left: none; margin-left: -5px;">Submit</button>
+        </div>
+    </section>
+
 
     <section class="cta-section">
         <h2 style="font-family: var(--font-serif); font-size: 5vw; font-weight: 300; margin-bottom: 4rem;">Join the movement.</h2>
@@ -166,7 +245,43 @@
                 <span>Total</span>
                 <span id="cart-total-price">EGP 0</span>
             </div>
-            <button class="btn-large checkout-btn" id="checkout-btn" style="width: 100%; text-align: center;">Checkout via WhatsApp</button>
+            <button class="btn-large checkout-btn" id="checkout-btn" style="width: 100%; text-align: center;" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- Quick Add Modal -->
+    <div class="quick-add-modal" id="quick-add-modal">
+        <div class="quick-add-content">
+            <button class="close-cart" onclick="closeQuickAdd()" style="position: absolute; top: 10px; right: 15px;">✕</button>
+            <h3 id="qa-title" style="font-size: 1.2rem; margin-bottom: 1rem;">Product Name</h3>
+            <div style="margin-bottom: 1.5rem;">
+                <p style="font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.7;">Select Size:</p>
+                <div id="qa-sizes" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <!-- Sizes injected here -->
+                </div>
+            </div>
+            <div style="margin-bottom: 2rem;">
+                <p style="font-size: 0.8rem; margin-bottom: 0.5rem; opacity: 0.7;">Select Color:</p>
+                <div id="qa-colors" style="display: flex; gap: 0.5rem;">
+                    <!-- Colors injected here -->
+                </div>
+            </div>
+            <button class="btn-large" id="qa-add-btn" style="width: 100%; text-align: center;">Add to Cart</button>
+        </div>
+    </div>
+
+    <!-- Search Overlay -->
+    <div class="quick-add-modal" id="search-modal">
+        <div class="quick-add-content" style="max-width: 600px; padding: 3rem;">
+            <button class="close-cart" onclick="document.getElementById('search-modal').classList.remove('active')" style="position: absolute; top: 10px; right: 15px;">✕</button>
+            <h2 style="margin-bottom: 1rem; font-family: var(--font-serif); font-size: 2rem;">Search</h2>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" id="search-input" placeholder="Search products, categories..." style="flex: 1; background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.5rem 0; font-size: 1.2rem; font-family: var(--font-sans); outline: none;">
+                <button class="btn-large" id="do-search-btn" style="padding: 0.5rem 1.5rem;">Go</button>
+            </div>
+            <div id="search-results" style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-height: 400px; overflow-y: auto;">
+                <!-- Search results injected here -->
+            </div>
         </div>
     </div>
 
