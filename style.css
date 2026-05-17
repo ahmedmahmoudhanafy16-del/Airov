@@ -735,9 +735,50 @@ footer {
     }
 
     /* ── Collection grid - 2 columns ── */
+    .filter-layout {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    .filter-sidebar {
+        width: 100% !important;
+        flex: none !important;
+        border-right: none !important;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-right: 0 !important;
+        padding-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 0 !important;
+    }
+    .filter-group h4 {
+        margin-bottom: 0 !important;
+    }
+    .filter-btn {
+        display: inline-block !important;
+        width: auto !important;
+        padding: 0.5rem 1rem !important;
+        background: rgba(255,255,255,0.05) !important;
+        border-radius: 20px;
+    }
+    .filter-btn.active {
+        background: var(--primary) !important;
+        color: var(--bg-dark) !important;
+    }
+    #sort-select {
+        width: auto !important;
+        flex: 1;
+    }
+    
     .collection-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.8rem;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.8rem !important;
     }
     .collection-item {
         position: relative;
