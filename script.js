@@ -1,6 +1,3 @@
-import { db } from './firebase-config.js';
-import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
@@ -8,18 +5,13 @@ const isMobile = window.matchMedia('(max-width: 768px)').matches;
 let productsCache = [];
 
 // Render CMS Data
-async function renderSiteData() {
-    // 1. Fetch Products from Firebase
-    try {
-        const querySnapshot = await getDocs(collection(db, "products"));
-        productsCache = [];
-        querySnapshot.forEach((docSnap) => {
-            productsCache.push({ id: docSnap.id, ...docSnap.data() });
-        });
-    } catch (error) {
-        console.error("Firebase fetch error:", error);
-        // Fallback to local data if firebase fails or keys missing
-        if (typeof siteData !== 'undefined') productsCache = siteData.products;
+function renderSiteData() {
+    // 1. Fetch Products from LocalStorage Database
+    productsCache = JSON.parse(localStorage.getItem('airov_db_products')) || [];
+    
+    // Fallback to local data if localStorage is empty
+    if (productsCache.length === 0 && typeof siteData !== 'undefined') {
+        productsCache = [...siteData.products];
     }
 
     // Render Hero (from siteData fallback or hardcoded for now)
@@ -109,16 +101,7 @@ async function renderSiteData() {
         const urlParams = new URLSearchParams(window.location.search);
         const productId = urlParams.get('id');
         
-        // Find in cache or fetch single from DB
         let product = productsCache.find(p => p.id === productId);
-        
-        if (!product && productId) {
-            try {
-                const docRef = doc(db, "products", productId);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) product = { id: docSnap.id, ...docSnap.data() };
-            } catch (e) { console.error(e); }
-        }
 
         if (product) {
             document.getElementById('product-title').innerText = product.name;
