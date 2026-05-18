@@ -1,3 +1,5 @@
+import { db, collection, onSnapshot, query, orderBy } from "./firebase-config.js";
+
 // Detect mobile
 const isMobile = window.matchMedia('(max-width: 768px)').matches;
 
@@ -6,13 +8,7 @@ let productsCache = [];
 
 // Render CMS Data
 function renderSiteData() {
-    // 1. Fetch Products from LocalStorage Database
-    productsCache = JSON.parse(localStorage.getItem('airov_db_products')) || [];
-    
-    // Fallback to local data if localStorage is empty
-    if (productsCache.length === 0 && typeof siteData !== 'undefined') {
-        productsCache = [...siteData.products];
-    }
+    // Note: productsCache is now populated dynamically via Firestore real-time listener!
 
     // Render Hero (from siteData fallback or hardcoded for now)
     if (document.getElementById('dynamic-slogan') && typeof siteData !== 'undefined') {
@@ -266,8 +262,32 @@ function renderSiteData() {
     }
 }
 
-// Call renderer
-renderSiteData();
+// Start Real-time Firestore sync
+function startRealtimeSync() {
+    const productsQuery = query(collection(db, "products"), orderBy("created_at", "desc"));
+    onSnapshot(productsQuery, (snapshot) => {
+        productsCache = [];
+        snapshot.forEach(docSnap => {
+            productsCache.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        
+        // Fallback to local siteData for preview/robustness if database is empty
+        if (productsCache.length === 0 && typeof siteData !== 'undefined') {
+            productsCache = [...siteData.products];
+        }
+        
+        // Re-render site UI with fresh data
+        renderSiteData();
+    }, (error) => {
+        console.error("Firestore sync failed, falling back to local siteData: ", error);
+        if (typeof siteData !== 'undefined') {
+            productsCache = [...siteData.products];
+            renderSiteData();
+        }
+    });
+}
+
+startRealtimeSync();
 
 // ==========================================
 // CART SYSTEM
@@ -844,3 +864,65 @@ if (typeof renderProducts === 'function') {
         }
     };
 }
+
+// Expose globals to window so inline onclick handlers in HTML continue working seamlessly with ES module script
+window.openQuickAdd = openQuickAdd;
+window.closeQuickAdd = closeQuickAdd;
+window.toggleWishlist = toggleWishlist;
+window.removeFromCart = removeFromCart;
+window.addToCart = addToCart;
+window.renderProducts = renderProducts;
+
+// Dynamic getters/setters for global state compatibility
+Object.defineProperty(window, 'productsCache', {
+    get: () => productsCache,
+    set: (val) => { productsCache = val; }
+});
+Object.defineProperty(window, 'wishlist', {
+    get: () => wishlist,
+    set: (val) => { wishlist = val; }
+});
+Object.defineProperty(window, 'cart', {
+    get: () => cart,
+    set: (val) => { cart = val; }
+});
+Object.defineProperty(window, 'getProductCardHTML', {
+    get: () => (product, customBadge = '') => {
+        // Expose internal function helper
+        const statusLabel = product.in_stock ? 'View Product' : 'Out of Stock';
+        let colorName = product.colors && product.colors.length > 0 ? (typeof product.colors[0] === 'string' ? product.colors[0] : product.colors[0].name) : '';
+        
+        let badgeHTML = '';
+        if (customBadge === 'new') badgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: var(--primary); color: var(--bg-dark); padding: 2px 8px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; z-index: 2;">NEW</div>`;
+        else if (customBadge === 'bestseller') badgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.2); color: var(--primary); padding: 4px 10px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; z-index: 2;">#1 Bestseller</div>`;
+        else if (customBadge === 'trending') badgeHTML = `<div style="position: absolute; top: 10px; left: 10px; background: var(--accent-pink); color: var(--bg-dark); padding: 4px 10px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; z-index: 2;">Trending</div>`;
+
+        let ratingHTML = '';
+        if (product.reviews && product.reviews.length > 0) {
+            const avgRating = (product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.reviews.length).toFixed(1);
+            ratingHTML = `<div style="font-size: 0.7rem; color: #f39c12; margin-top: 5px;"><i class="fas fa-star"></i> ${avgRating} (${product.reviews.length})</div>`;
+        }
+
+        return `
+            <div class="collection-item" style="position: relative;">
+                ${badgeHTML}
+                <button class="wishlist-btn" onclick="toggleWishlist('${product.id}')" style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+                    <i class="far fa-heart"></i>
+                </button>
+                <a href="product.html?id=${product.id}" style="text-decoration: none; color: inherit; display: block;">
+                    <img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; aspect-ratio: 3/4; object-fit: cover;">
+                </a>
+                <div class="quick-add-overlay" style="position: absolute; bottom: 80px; left: 0; width: 100%; padding: 0 10px; opacity: 0; transition: opacity 0.3s; pointer-events: none;">
+                    <button onclick="openQuickAdd('${product.id}')" class="btn-large" style="width: 100%; padding: 0.5rem; font-size: 0.8rem; pointer-events: auto;">Quick Add</button>
+                </div>
+                <a href="product.html?id=${product.id}" style="text-decoration: none; color: inherit; display: block;">
+                    <div class="collection-info" style="padding-top: 1rem;">
+                        <h3 class="collection-name">${product.name}</h3>
+                        <p class="collection-price">${colorName} / EGP ${product.price}</p>
+                        ${ratingHTML}
+                    </div>
+                </a>
+            </div>
+        `;
+    }
+});

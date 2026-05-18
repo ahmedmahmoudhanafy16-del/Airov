@@ -27,6 +27,8 @@
             <div class="sidebar-logo">AIROV</div>
             <nav class="sidebar-nav">
                 <button class="nav-btn active" data-target="products-view">Products</button>
+                <button class="nav-btn" data-target="orders-view">Orders</button>
+                <button class="nav-btn" data-target="coupons-view">Coupons</button>
                 <button class="nav-btn" data-target="categories-view">Categories</button>
                 <button class="nav-btn" data-target="settings-view">Settings</button>
             </nav>
@@ -80,16 +82,27 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label>Price (EGP)</label>
+                                <label>Price / Sale Price (EGP)</label>
                                 <input type="number" id="prod-price" required>
                             </div>
+                            <div class="form-group">
+                                <label>Original Price (EGP - Optional)</label>
+                                <input type="number" id="prod-original-price">
+                            </div>
+                        </div>
+                        <div class="form-row">
                             <div class="form-group">
                                 <label>Category</label>
                                 <select id="prod-category" required>
                                     <option value="hoodies">Hoodies</option>
                                     <option value="jackets">Jackets</option>
                                     <option value="tees">Tees</option>
+                                    <option value="bottoms">Bottoms</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Badges (Comma separated)</label>
+                                <input type="text" id="prod-badges" placeholder="e.g. new, trending, bestseller">
                             </div>
                         </div>
 
@@ -122,20 +135,125 @@
                 </div>
             </div>
 
+            <!-- Orders View -->
+            <section id="orders-view" class="view-section hidden">
+                <div class="header-flex">
+                    <h1>Manage Orders</h1>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer Name</th>
+                                <th>Phone</th>
+                                <th>Total (EGP)</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody">
+                            <!-- Dynamic Orders -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Coupons View -->
+            <section id="coupons-view" class="view-section hidden">
+                <div class="header-flex">
+                    <h1>Manage Coupon Codes</h1>
+                    <button id="show-add-coupon" class="btn-primary">+ Add Coupon</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Expires</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coupons-tbody">
+                            <!-- Dynamic Coupons -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Add/Edit Coupon Modal -->
+            <div id="coupon-modal" class="modal hidden">
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="header-flex">
+                        <h2>Add New Coupon</h2>
+                        <button class="close-modal" onclick="document.getElementById('coupon-modal').classList.add('hidden')">✕</button>
+                    </div>
+                    <form id="coupon-form" class="admin-form">
+                        <div class="form-group">
+                            <label>Coupon Code</label>
+                            <input type="text" id="coupon-code-input" required placeholder="e.g. AIROV20">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select id="coupon-type" required>
+                                    <option value="percentage">Percentage (%)</option>
+                                    <option value="fixed">Fixed Amount (EGP)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Value</label>
+                                <input type="number" id="coupon-value" required min="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Expires At</label>
+                            <input type="date" id="coupon-expiry">
+                        </div>
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn-primary" style="flex:1;">Save Coupon</button>
+                            <button type="button" class="btn-secondary" onclick="document.getElementById('coupon-modal').classList.add('hidden')" style="flex:1;">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Categories View -->
             <section id="categories-view" class="view-section hidden">
                 <div class="header-flex">
                     <h1>Manage Categories</h1>
-                    <button class="btn-primary">+ Add Category</button>
                 </div>
-                <p>Category management will be synced with Firebase here.</p>
+                <p style="opacity: 0.7;">Categories are synced with active products: hoodies, jackets, tees, bottoms.</p>
+            </section>
+
+            <!-- Settings View -->
+            <section id="settings-view" class="view-section hidden">
+                <div class="header-flex">
+                    <h1>Store Settings</h1>
+                </div>
+                <div class="form-group" style="max-width: 500px; margin-top: 2rem;">
+                    <label>Store Name</label>
+                    <input type="text" value="AIROV" disabled>
+                </div>
+                <div class="form-group" style="max-width: 500px;">
+                    <label>Currency</label>
+                    <input type="text" value="EGP" disabled>
+                </div>
+                <div class="form-group" style="max-width: 500px;">
+                    <label>Firebase Project ID</label>
+                    <input type="text" value="airov-store" disabled>
+                </div>
+                <p style="opacity: 0.5; font-size: 0.8rem; margin-top: 2rem;">Store settings are managed via code configuration.</p>
             </section>
 
         </main>
     </div>
 
     <!-- Admin Dashboard JS -->
-    <script src="../data.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -256,8 +256,9 @@
         </div>
     </div>
 
-    <script src="data.js"></script>
-    <script>
+    <script type="module">
+        import { db, collection, addDoc } from "./firebase-config.js";
+
         let cart = JSON.parse(localStorage.getItem('airov_cart')) || [];
         let selectedPaymentMethod = 'card';
         let subtotal = 0;
@@ -355,39 +356,80 @@
             selectedPaymentMethod = method;
         }
 
-        function completeCheckout() {
+        async function completeCheckout() {
             const email = document.getElementById('c-email').value;
             const fname = document.getElementById('c-fname').value;
             const lname = document.getElementById('c-lname').value;
-            if (!email || !fname || !lname) {
-                alert('Please fill out all required contact fields.');
+            const address = document.getElementById('c-address').value;
+            const gov = document.getElementById('c-gov').value;
+            const phone = document.getElementById('c-phone').value;
+
+            if (!email || !fname || !lname || !address || !phone) {
+                alert('Please fill out all required contact and address fields.');
                 goToStep(2);
                 return;
             }
 
+            const payBtn = document.querySelector('button[onclick="completeCheckout()"]');
+            payBtn.innerText = "Processing...";
+            payBtn.disabled = true;
+
+            const orderNumber = 'ARV-' + Math.floor(100000 + Math.random() * 900000);
+
             // Create Order Object
             const order = {
-                id: 'ARV' + Math.floor(Math.random() * 100000),
-                date: new Date().toLocaleDateString(),
-                status: 'Pending',
-                total: subtotal + shipping,
+                order_number: orderNumber,
+                customer_name: fname + ' ' + lname,
+                customer_email: email,
+                customer_phone: phone,
+                address: address,
+                governorate: gov,
                 items: cart,
-                method: selectedPaymentMethod
+                subtotal: subtotal,
+                shipping: shipping,
+                total: subtotal + shipping,
+                payment_method: selectedPaymentMethod,
+                status: 'pending',
+                created_at: new Date()
             };
 
-            // Save to Mock DB (Order History)
-            let orders = JSON.parse(localStorage.getItem('airov_orders')) || [];
-            orders.push(order);
-            localStorage.setItem('airov_orders', JSON.stringify(orders));
+            try {
+                // Save to Firebase Firestore
+                await addDoc(collection(db, "orders"), order);
 
-            // Clear Cart
-            localStorage.setItem('airov_cart', JSON.stringify([]));
+                // Save to local Order History (for this user/session)
+                let localOrders = JSON.parse(localStorage.getItem('airov_orders')) || [];
+                localOrders.push({
+                    id: orderNumber,
+                    date: new Date().toLocaleDateString(),
+                    status: 'Pending',
+                    total: order.total,
+                    items: order.items,
+                    method: order.payment_method
+                });
+                localStorage.setItem('airov_orders', JSON.stringify(localOrders));
 
-            // Show Success
-            document.getElementById('order-id-display').innerText = '#' + order.id;
-            goToStep(4);
-            document.querySelector('.checkout-sidebar').style.display = 'none'; // hide sidebar on success
+                // Clear Cart
+                localStorage.setItem('airov_cart', JSON.stringify([]));
+
+                // Show Success
+                document.getElementById('order-id-display').innerText = '#' + orderNumber;
+                goToStep(4);
+                document.querySelector('.checkout-sidebar').style.display = 'none'; // hide sidebar on success
+            } catch (err) {
+                console.error("Order creation failed: ", err);
+                alert("Failed to submit order. Please try again: " + err.message);
+            } finally {
+                payBtn.innerText = "Pay Now";
+                payBtn.disabled = false;
+            }
         }
+
+        // Expose functions to global window namespace
+        window.removeCheckoutItem = removeCheckoutItem;
+        window.goToStep = goToStep;
+        window.selectPayment = selectPayment;
+        window.completeCheckout = completeCheckout;
 
         // Init
         if (cart.length === 0) {
