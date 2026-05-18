@@ -393,16 +393,33 @@ function populateEditForm(p) {
     productModal.classList.remove('hidden');
 }
 
-async function deleteProduct(id) {
-    if (confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
-        try {
-            await deleteDoc(doc(db, "products", id));
-        } catch (err) {
-            console.error("Failed to delete:", err);
-            alert("Error deleting product: " + err.message);
-        }
-    }
+let productToDeleteId = null;
+const deleteModal = document.getElementById('delete-modal');
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
+function deleteProduct(id) {
+    productToDeleteId = id;
+    deleteModal.classList.remove('hidden');
 }
+
+confirmDeleteBtn.addEventListener('click', async () => {
+    if (!productToDeleteId) return;
+
+    confirmDeleteBtn.innerText = "Deleting...";
+    confirmDeleteBtn.disabled = true;
+
+    try {
+        await deleteDoc(doc(db, "products", productToDeleteId));
+        deleteModal.classList.add('hidden');
+    } catch (err) {
+        console.error("Failed to delete:", err);
+        alert("Error deleting product: " + err.message);
+    } finally {
+        confirmDeleteBtn.innerText = "Delete";
+        confirmDeleteBtn.disabled = false;
+        productToDeleteId = null;
+    }
+});
 
 // ==========================================
 // ORDERS MANAGEMENT
